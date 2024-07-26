@@ -1,0 +1,605 @@
+  Spring Framework
+  ---------------
+
+  - earlier we used EJB
+  - for developing web application we used struts
+  - to work with db we used ORM, Hibernate
+
+-Spring can be used to for all above specified Frameworks
+-Spring is light weight Framework
+-Spring works with POJOs(Plain Old Java Object)
+
+
+official website --> spring.io
+Initially its was developed for dependency injection, but now used for various applications
+Spring is a ecosystem which has larger projects
+can also use kotlin as a language
+
+
+Spring docs
+-----------
+famous because
+1)Features
+2) Community
+3) documentation(spring docs)
+
+
+Prequistes
+------------
+
+- core java
+- JDBC
+- build tool
+- ORM or Hibernate
+- Servlets
+
+
+IDE for spring
+------------------
+- JDK
+- eclipse
+- intellj
+- vs code
+- spring --> development tools
+
+---------------------------------------------
+In legacy java projects
+  - we create the Object
+  - Maintain the Object
+  - destroy the Object
+so this causes lack of focus in business logic
+
+IOC --> Inversion of control (principle)
+ - to achieve this we IOC container in spring
+ - inside the IOC container we will have all the objects
+
+To achieve this we use a design pattern called DI
+
+DI --> dependency injection (design pattern)
+---------------------------------------------------------
+
+spring vs spring boot
+
+for spring need to do more configs
+    - creating a project
+    - configuring the xml
+    - creating the beans
+
+whereas spring boot is opinionated Framework
+
+spring 6 --> spring boot 3
+
+website to create a project ===> https://start.spring.io/
+
+spring boot
+     
+     DI using spring boot
+        - instead of creating an object we can use application context
+        - using @component and @Autowired we can make sure the methods can be called
+        
+in spring we have different way 
+    - xml config
+    -- java based coding
+    -- annotations
+
+    -----------------------------------------------------------------------------------------------------------
+
+
+Spring Framework
+================
+
+-- create a basic quick start spring project
+--- go to mvnrepository check for spring context
+-- add it pom.xml file
+
+using xml we are creating the object 
+
+  beans are the objects managed by spring Framework
+
+
+
+using container:
+-----------------
+ //container creation
+        ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+        Alien obj = (Alien) context.getBean("alien");
+
+Object creation:
+---------------
+use --> https://docs.spring.io/spring-framework/docs/4.2.x/spring-framework-reference/html/xsd-configuration.html
+
+<bean id="alien" class="org.pradheep.Alien"> </bean>
+
+Scopes:
+-----------
+  - singleton
+  - prototype
+  - Request
+  - session
+
+But in spring code we mostly use 2:
+  - singleton --> it will be loaded anytime container is created
+  - prototype --> object will be created only when getBean is called
+
+by default it follows singleton
+
+<bean id="alien" class="org.pradheep.Alien" scope="singleton"> </bean>
+- it creates only one object and throughout we use it as reference
+
+<bean id="alien" class="org.pradheep.Alien" scope="prototype"> </bean>
+- it creates objects everytime
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+Setter injection
+-------------------
+when we have a property inside a class, we can use this property tag to set a value.
+it will call the setter method when object created
+<bean id="alien" class="org.pradheep.Alien" >
+        <property name="age" value="21"> </property>
+</bean>
+
+------------------------------------------------------------------------------------------------
+
+reference Attribute
+------------------
+ref variable used as an obj reference
+eg:    <property name="lap" ref="lap1"> </property>
+
+------------------------------------------------------------------------------------
+Constructor injection
+---------------------
+    - it can be done using Constructor-arg tag
+    - it depends on the sequence by default
+    - we can use index, name, type to differentiate the parameters
+    - else can use the @ConstructorProperties annotation to pass the arugments
+------------------------------------------------------------------------------------------------------
+
+Creating Interface
+-----------------
+We can create an interface as usual for a method and override it in two different classes
+
+Autowiring
+----------
+
+using Autowiring we can invoke both the methods in those classes
+
+eg:
+---
+
+byName: this works if the id and ref variable looks same
+
+ <bean id="alien" class="org.pradheep.Alien" autowire="byName">
+ <bean id="com" class="org.pradheep.Laptop"> </bean>
+
+byType: this works by checking the type of the id ref
+
+<bean id="alien" class="org.pradheep.Alien" autowire="byType">
+<bean id="com1" class="org.pradheep.Laptop"> </bean>
+
+
+Primary bean
+--------------
+    it is used to mention the bean as primary in autowire
+
+     <bean id="com1" class="org.pradheep.Laptop" primary="true"> </bean>
+
+-----------------------------------------------------------------------------------------------------------------------
+
+Lazy initialization of a bean
+------------------------------
+
+    it helps in creating a  bean obj only when needed
+    eg :
+      <bean id="com2" class="org.pradheep.DeskTop" lazy-init="true"> </bean>
+
+----------------------------------------------------------------------------------------------------------------------------
+GetbeanByType:
+eg:
+ Alien obj =  context.getBean("alien",Alien.class);
+
+  DeskTop obj1 =context.getBean(DeskTop.class);
+-----------------------------------------------------------------
+
+Inner bean
+------------
+inner bean is bean within a bean. parent bean can only access child beans
+
+--------------------------------------------------------------------------------------------------------------
+
+
+Java Based config
+-------------------
+  we can java config instead of xml
+
+    -create java class
+    - in application context use AnnotationConfigApplicationContext(class name)
+    - use @configuration annotation inside the java class
+    - create an object of the class need to be used using a method
+    - then using getBean we can call the method
+
+    eg: ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+
+    config file: 
+    -------------
+         @Configuration
+         public class AppConfig
+         @Bean
+         public DeskTop desktop(){
+            return new DeskTop();
+         }
+
+BeanName:
+-------------
+   Bean name will be usually the method name inside the config file
+   we can also explicitly name them
+   eg: @Bean(name={"com2","desktop1","Beast"})
+
+Scope Annotation
+------------------
+  - By Default a bean is singleton
+  - By using @Scope("prototype") we can make it act different
+  - so everytime a new object is created if needed
+
+Autowired 
+-----------
+    - to establish autowire we can pass the obj of the class which needs to associated with
+    - it will check for the obj in the java config file and maps it accordingly
+
+    Eg:  public Alien alien(Computer com)
+        @Bean
+        public DeskTop desktop(){}
+
+  Primary  & Qualifier
+  -------------------
+      - if an ref obj matches two beans it shows an error
+      - to reslove it we can use two ways use @Primary or use @Qualifier("obj name")
+
+Component Stereotype Annotation
+----------------------------------
+
+ instead of doing all the above we can use certain annotations and make to work
+        - in java config file use @configuration and @ComponentScan("com.eg") package name
+        - in the files use @Component and for connections use @Autowired.
+        - Then to specify the bean either use @Primary or @Qualifier("value")
+
+Autowiring can be done in 3 forms
+----------------------------------
+      - field injection
+      - Constructor injection
+      -  Setter injection (most preferable)
+
+Primary Annotation
+---------------0----
+   use on top of the class
+   @Primary
+
+   But when we use Qualifier and primary
+   always Qualifier will take the precedence
+
+
+Scope and value annotation
+---------------------------
+    scope has two types:
+        - singleton
+        - prototype
+        @Scope("prototype")
+
+    @Value() - can pass a value
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+Spring boot
+-----------
+  We can use all the annotations used in spring
+
+Different Layers
+---------------
+
+in an application
+
+client <------> server <----> db
+
+in a server we can have multiple Layers
+
+    - controller
+    - service   --> all logics implemented here, processing only
+    - repository (DAO-Data Access Object)  --> responsible for fetching data from db 
+
+
+===============================================================================================================================
+
+
+Spring JDBC
+-------------
+in java using normal JDBC we have create and maintain it ourselves with the below following steps
+    -Load driver
+    - Define Connection URL
+    - Establish Connection
+    - Create Statement Object
+    - Execute Query using Statement
+    - Proces result
+    - close connection
+
+  Whereas in spring JDBC it reduces our effort with less steps
+
+  Spring JDBC has multiple components to work with
+
+      - jdbc Template - it helps us to perform the following
+                            . Connect with db
+                            . Fire Queries
+                            . Process data
+                            . Query output
+
+      - Datasource - we can use it to maintain the connection with the help of Datasource.(spring provides)
+
+      We will be using H2 db -its an in-memory db
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+Web App Intro:
+
+  -in order to connect with web get the request from an user made using web browser 
+  - we need a special container or Web container which are provided by Servlets
+    
+JSP --> java servlet package
+
+Eg: create a quickstart java project using maven (refer ServletEx )
+
+servlet has various methods get, post , delete, update
+
+
+---------------------------------------------------------------------------------------------------
+
+Intro to MVC:
+-----------------
+MVC- Model View controller
+
+  - Basically when a client(browser) send a request to the backend.
+  - It is recieved by a servlet then if we need any data from db, it a part of the object
+  - then its sent to the view part(Jakarta server pages or view pages) 
+  - which takes the data reference from the object and returns in the form of html pages to the client
+
+
+           Request   |---Controller(Servlet)             |
+  Client ----------->|         |------Model(Data/Object) |------> DB
+         <-----------|---View(JSP)                       |
+          Text(html)
+
+In tomcat its kind of container which handles servlet but we do have JSP(which actually get converted into servlet) in it.
+
+----------------------------------------------------------------------------
+
+
+For a MVC project using Spring boot MVC :
+
+need to download a project from spring intiliazer 
+-in that need to add the package spring Web
+-when we run it we will get white label error
+- inside main --> web --> index.JSP
+- create a controller with an annotation of @Controlller
+- Request mapping had to done for that JSP page using @RequestMapping annotation
+- Need to have a dependency use tomcat jasper in pom.xml
+-Sending data to controller --> eg: can create a form to add two numbers with add button
+- spring allows us to certain operationn like adding user, updating user, deleting a user
+- Need to create a RequestMapping with add navigating to the result page
+- getting an input parameters with HttpServletRequest 
+
+    Eg: @RequestMapping("add")
+      public String add(HttpServletRequest req){
+        int num1= Integer.parseInt(req.getParameter("num1"))
+      }
+
+- similar we can add the data
+- Now have to display the data in Result page, can use a HttpSession
+    Eg: @RequestMapping("add")
+      public String add(HttpServletRequest req, HttpSession session){
+        int num1= Integer.parseInt(req.getParameter("num1"))
+        ...................
+        ..............
+        session.SetAttribute("result",result)
+      }
+- can display the data in jsp eg: <%session.getAttribute("result")%> or {result} --> JSTL(JavaServer pages tag library)
+- we can simply the code using Request parameter
+    eg: @RequestMapping("add")
+      public String add(int num1, int num2, HttpSession session){
+        int result = num1+num2
+        ...................
+        .....................
+
+      }
+
+- we can even pass a different parameter name with same datatype to receive the data
+        eg:  public String add(@RequestParam("num1") int num, int num2, HttpSession session){
+- need to use the annotation @RequestParam
+
+- As per the MVC pattern we have the controller --> view an the Model. whereas the model object can be used 
+ instead of HttpSession
+
+      eg:  @RequestMapping("add")
+      public String add(int num1, int num2, Model model){
+        int result = num1+num2
+        model.SetAttribute("result",result)
+      }
+- instead of using .jsp we can directly use index in RequestMapping for that need to place the jsp files
+like web--> views
+
+- then inside the resources--> application properties we have to mention prefix and suffix
+    eg: spring.mvc.view.prefix =/views/
+        spring.mvc.view.suffix =.jsp
+
+- Css files can be kept on resources--> static folder
+- instead of model we can use modelview object
+    eg:  @RequestMapping("add")
+      public String add(int num1, int num2, ModelView mv){
+        int result = num1+num2
+        mv.addObject("result",result)
+        mv.setViewName("result")
+        return mv;
+      }
+- also instead of getting multiple we can use an object with an annotation of modelattribute
+
+      eg: public string addAlien(@ModelAttribute Alien alien){
+           return "result"
+      }
+======================================================================================================================================
+
+Spring MVC:
+------------
+- for spring mvc we need external tomcat
+- tomcat 10 uses jakarta.*;
+
+=================================================================
+
+Spring Web
+
+As we already know the mvc pattern has
+
+-Controller
+-service
+-repository
+
+eg: we can create a spring web app 
+    create a multiple controllers but still it works
+
+    This is because front controller --> it looks into all request mapping 
+  
+Service layer is from where we get the business logic
+
+Modal layer which handles the data
+
+
+Rest Api has some http methods
+
+- get 
+-post
+-put
+-delete
+
+CRUD operations
+
+Then instead of jdbc we can go for orm(Object relational mapping)
+
+some tools used: 
+
+ - Hibernate
+ - eclipse link
+ - my batis
+
+ JPA(Java Persistance API) --its a standard
+
+ special modal --> spring data JPA
+
+
+insert, delete, update , create 
+
+
+
+JPQL - java Persistance Query language
+
+
+Spring AOP:
+---------
+
+Aspect oriented Programming
+
+it will solve the probelm of cross cutting concerns
+
+-logging calls
+
+join  points(when)--> want to call any method in a service
+advice(what)      --> everytime we call method inside a service(eg: update, delete method) at the moment need to call
+                      log method, exception or a  security
+Aspect(Where conceptual)--> where we place our log , security methods say class
+Pointcut(where operational)--> every timr we call a method
+target object(whom) --> main character
+weaving(how)--> happens in runtime
+proxy(the double)-->object(stunt) created after applying advice to the target object(hero)
+type of advices(genre) --> before after or after getting error in a method 
+    - before(the setup)
+    - after(the alternative)
+    - after throwing(the plot twist)
+    - around(the full story )
+
+
+spring data Rest
+--------------
+Spring data rest is something where both service and controller layer can be bypassed and just by using repo we can handle the request
+
+From spring intiliazer we need add a package named Rest repositories
+
+
+Spring security
+--------------
+
+Basically an app should work, stable, performance
+authorization, authentication
+
+
+OWASP 10
+----------
+broken acces control
+cryptographic failuures
+injection
+insecure design
+security misconfiguration
+vulnerable component
+authentication failuures
+software and data integrity failures
+security logging and monitoring failures
+server side request forgery
+
+Spring sec app:
+
+Add a maven dependency spring security(will add login page to the app)
+
+client ---> Spring security(Filters) --> Dispatcher servleet (Front controller)   --> controllers
+
+we  have different types of filters in a filter chain:
+
+client --> servlet container --> filters(webconfig filter--> usernamepassword filter) --> Servlet
+
+session Id--> once we login it maintains a session
+
+Setting user name and password--> in application properties
+Basic auth in postman--> auth--> basic auth--> enter credential
+
+
+Cross site request forgery  (CSRF)
+-----------------------
+           session ID   
+   browser -----------> gmail server
+           <------------
+
+           ------------> malicous website (which tries to access the session ID of gmail server)
+
+for getmapping it will not check for csrf token but for others we  need it
+
+Same site strict--> in application.properties -->  server.servlet.session.cookie.same-site=strict
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
